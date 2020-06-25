@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LaunchCode
@@ -66,22 +67,31 @@ public class JobData {
      * @return List of all jobs matching the criteria
      */
     public static ArrayList<HashMap<String, String>> findByColumnAndValue(String column, String value) {
-
         // load data, if not already loaded
         loadData();
-
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
-
         for (HashMap<String, String> row : allJobs) {
-
-            String aValue = row.get(column);
-
+            String aValue = row.get(column).toLowerCase();
             if (aValue.contains(value)) {
                 jobs.add(row);
             }
         }
-
         return jobs;
+    }
+
+    public static ArrayList<HashMap<String, String>> findByValue(String value) {
+        loadData();
+        ArrayList<HashMap<String, String>> valJob = new ArrayList<>();
+       for (int i = 0; i < allJobs.size(); i++) {
+           HashMap<String, String> job = new HashMap<>();
+           if(allJobs.get(i).values().toString().toLowerCase().contains(value)) {
+               for (Map.Entry<String, String> row : allJobs.get(i).entrySet()) {
+                   job.put(row.getKey(), row.getValue());
+               }
+               valJob.add(job);
+           }
+       }
+        return valJob;
     }
 
     /**
@@ -95,7 +105,6 @@ public class JobData {
         }
 
         try {
-
             // Open the CSV file and set up pull out column header info and records
             Reader in = new FileReader(DATA_FILE);
             CSVParser parser = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
@@ -108,7 +117,6 @@ public class JobData {
             // Put the records into a more friendly format
             for (CSVRecord record : records) {
                 HashMap<String, String> newJob = new HashMap<>();
-
                 for (String headerLabel : headers) {
                     newJob.put(headerLabel, record.get(headerLabel));
                 }
